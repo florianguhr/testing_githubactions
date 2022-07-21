@@ -1,0 +1,67 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  Creates ECR and user to push containers for deployment
+
+Resources:
+  MyUser:
+    Type: AWS::IAM::User
+    Properties: 
+      UserName: MyECRUser
+
+  MyAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Status: Active
+      UserName: !Ref MyUser
+    DependsOn: MyUser
+
+  MyRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      ImageScanningConfiguration: 
+          ScanOnPush: False
+      ImageTagMutability: MUTABLE
+      RepositoryName: docker-golang-demo
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: 
+                - !GetAtt MyUser.Arn
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+    DependsOn: MyAccessKey
+
+Outputs:
+  RepoURL:
+    Value: !GetAtt MyRepository.RepositoryUri
+  AccessKey:
+    Value: !Ref MyAccessKey
+  AccessSecret:
+    Value: !GetAtt MyAccessKey.SecretAccessKey
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
