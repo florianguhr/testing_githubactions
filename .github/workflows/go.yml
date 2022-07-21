@@ -51,7 +51,7 @@ jobs:
         ECR_REPOSITORY: docker-golang-demo
         IMAGE_TAG: docker-golang-image
       with:
-       image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+       image-ref: '${{ECR_REGISTRY}}/${{ECR_REPOSITORY}}:${{IMAGE_TAG}}'
        format: 'template'
        template: '@/contrib/sarif.tpl'
        output: 'trivy-results.sarif'
