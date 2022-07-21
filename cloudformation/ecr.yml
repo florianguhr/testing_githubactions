@@ -17,23 +17,15 @@ Resources:
       UserName: !Ref MyUser
     DependsOn: MyUser
 
-  MyRepository:
-    Type: AWS::ECR::Repository
-    Properties: 
-      ImageScanningConfiguration: 
-          ScanOnPush: False
-      ImageTagMutability: MUTABLE
-      RepositoryName: docker-golang-demo
-      RepositoryPolicyText: 
+  MyECRPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AllowECRPushPull
+      PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
-          - 
-            Sid: AllowPushPull
-            Effect: Allow
-            Principal: 
-              AWS: 
-                - !GetAtt MyUser.Arn
-            Action: 
+        Statement:
+          - Effect: Allow
+            Action:
               - "ecr:GetDownloadUrlForLayer"
               - "ecr:BatchGetImage"
               - "ecr:BatchCheckLayerAvailability"
@@ -42,6 +34,19 @@ Resources:
               - "ecr:UploadLayerPart"
               - "ecr:CompleteLayerUpload"
               - "ecr:GetAuthorizationToken"
+            Resource: '*'
+      Users:
+        - !Ref MyUser
+    DependsOn: MyUser
+
+
+  MyRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      ImageScanningConfiguration: 
+          ScanOnPush: False
+      ImageTagMutability: MUTABLE
+      RepositoryName: docker-golang-demo
     DependsOn: MyAccessKey
 
 Outputs:

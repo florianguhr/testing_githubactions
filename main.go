@@ -8,7 +8,7 @@ import (
 func main() {
 	// handle route using handler function
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to my new server!")
+		fmt.Fprintf(w, "Welcome to my api new server!")
 	})
 
 	// listen to port
