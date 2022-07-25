@@ -80,17 +80,19 @@ jobs:
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
     
-    - name: Run Terrascan
-      id: terrascan
-      uses: tenable/terrascan-action@main
+    - name: Run Checkov action
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
       with:
-        iac_type: 'terraform'
-        iac_version: 'v14'
-        policy_type: 'aws'
-        only_warn: true
-        sarif_upload: true
-    
-    - name: Upload Terrascan SARIF file
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: terrascan.sarif
+        directory: example/
+        quiet: true # optional: display only failed checks
+        soft_fail: true # optional: do not return an error code if there are failed checks
+        framework: terraform # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
+        output_format: sarif # optional: the output format, one of: cli, json, junitxml, github_failed_only, or sarif. Default: sarif
+        download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
+        log_level: DEBUG # optional: set log level. Default WARNING
+          
+    # - name: Upload Terrascan SARIF file
+    #   uses: github/codeql-action/upload-sarif@v2
+    #   with:
+    #     sarif_file: terrascan.sarif
