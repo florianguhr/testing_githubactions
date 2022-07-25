@@ -18,10 +18,30 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.18
+    
+    # User CodeQL as SAST Tool and upload results to github
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: go
 
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        # Path to SARIF file relative to the root of the repository
+        sarif_file: results.sarif
+        # Optional category for the results
+        # Used to differentiate multiple results for one commit
+        category: my-analysis-tool
+
+    # start the build process
     - name: Build
       run: go build -v ./...
 
+    # Run your defined Tests
     # - name: Test
     #   run: go test -v ./...
 
@@ -53,7 +73,7 @@ jobs:
        output: 'trivy-results.sarif'
        severity: 'CRITICAL,HIGH'
 
-    - name: Push image
+    - name: Push image to ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: docker-golang-demo
