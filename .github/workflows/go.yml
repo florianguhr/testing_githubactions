@@ -81,7 +81,6 @@ jobs:
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
     
     - name: Run Checkov action for kubernetes
-      id: checkov
       uses: bridgecrewio/checkov-action@master
       with:
         directory: /kubernetes
@@ -98,7 +97,6 @@ jobs:
         sarif_file: results.sarif
 
     - name: Run Checkov action for terraform
-      id: checkov
       uses: bridgecrewio/checkov-action@master
       with:
         directory: /terraform
