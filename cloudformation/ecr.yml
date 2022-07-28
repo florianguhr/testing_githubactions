@@ -42,6 +42,7 @@ Resources:
 
   MyRepository:
     Type: AWS::ECR::Repository
+    DeletionPolicy: Delete
     Properties: 
       ImageScanningConfiguration: 
           ScanOnPush: False
