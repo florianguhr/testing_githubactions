@@ -18,6 +18,15 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.18
+
+    # User CodeQL as SAST Tool and upload results to github
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: go
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
     
     # start the build process
     - name: Build
