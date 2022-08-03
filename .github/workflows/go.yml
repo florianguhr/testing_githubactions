@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.18
-
+    
     # User CodeQL as SAST Tool and upload results to github
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
@@ -27,7 +27,7 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
-    
+
     # start the build process
     - name: Build
       run: go build -v ./...
@@ -80,3 +80,37 @@ jobs:
     - name: Log out of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
+    
+    - name: Run Checkov action for kubernetes
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ./kubernetes
+        quiet: true # optional: display only failed checks
+        soft_fail: true # optional: do not return an error code if there are failed checks
+        framework: kubernetes # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
+        output_format: sarif # optional: the output format, one of: cli, json, junitxml, github_failed_only, or sarif. Default: sarif
+        download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
+        log_level: DEBUG # optional: set log level. Default WARNING
+          
+    - name: Upload Terrascan SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: results.sarif
+        category: kubernetes
+
+    - name: Run Checkov action for terraform
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ./terraform
+        quiet: true # optional: display only failed checks
+        soft_fail: true # optional: do not return an error code if there are failed checks
+        framework: terraform # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
+        output_format: sarif # optional: the output format, one of: cli, json, junitxml, github_failed_only, or sarif. Default: sarif
+        download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
+        log_level: DEBUG # optional: set log level. Default WARNING
+          
+    - name: Upload Terrascan SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: results.sarif
+        category: terraform
